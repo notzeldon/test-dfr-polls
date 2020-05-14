@@ -1,6 +1,7 @@
 from django.http import Http404
 from django.utils.timezone import localtime
 from rest_framework import generics
+from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 
 from . import models, serializers
@@ -14,6 +15,7 @@ class BasePollAPIView(generics.GenericAPIView):
     serializer_class = serializers.PollSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['id',]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class BaseQuestionAPIView(generics.GenericAPIView):
@@ -21,6 +23,7 @@ class BaseQuestionAPIView(generics.GenericAPIView):
     serializer_class = serializers.QuestionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['id', 'poll']
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class BaseAnswerAPIView(generics.GenericAPIView):
@@ -28,12 +31,15 @@ class BaseAnswerAPIView(generics.GenericAPIView):
     serializer_class = serializers.AnswerSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['id', 'question']
+    permission_classes = [permissions.IsAuthenticated]
 
 # For administrate
 
 
 class AdminPollView(generics.ListCreateAPIView, generics.RetrieveUpdateDestroyAPIView, BasePollAPIView):
 
+    permission_classes = [permissions.IsAdminUser]
+    
     def get_serializer_class(self):
         if self.request.method in ['GET', 'POST']:
             return serializers.PollSerializer
@@ -50,6 +56,7 @@ class AdminQuestionView(
     generics.ListCreateAPIView, generics.RetrieveUpdateDestroyAPIView,
     BaseQuestionAPIView
 ):
+    permission_classes = [permissions.IsAdminUser]
 
     def get_object(self):
         if self.request.method not in ['GET', 'POST']:
@@ -94,18 +101,29 @@ class AnswerView(generics.ListCreateAPIView, BaseAnswerAPIView):
     pass
 
 
-
-
 # Polling
 
 class QuestionPollingView(generics.CreateAPIView):
     """Returns list non-passed questions for poll
+
+    # TODO: Fix multiple answers
     """
+    permission_classes = [permissions.IsAuthenticated]
+
     serializer_class = serializers.UserAnswerSerializer
     queryset = models.UserAnswer.objects.all()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class PassedPollsView(generics.ListAPIView, BasePollAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    serializer_class = serializers.PassedPollSerializer
+
+    def get_queryset(self):
+        return super().get_queryset().filter(questions__users_answers__user=self.request.user)
 
 
 

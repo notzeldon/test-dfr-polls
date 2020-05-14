@@ -12,8 +12,7 @@ urlpatterns = [
         # Polling views
         path('polling/', views.QuestionPollingView.as_view()),
 
-        # Detail view
-        # path('question/<int:pk>/', views.QuestionDetail.as_view()),
+        path('results/', views.PassedPollsView.as_view()),
 
         # Admin views
         path('admin/', include([

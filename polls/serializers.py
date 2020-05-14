@@ -32,8 +32,6 @@ class QuestionSerializer(serializers.ModelSerializer):
         fields = ['id', 'text', 'qtype']
 
 
-
-
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
@@ -69,5 +67,25 @@ class UserAnswerSerializer(serializers.ModelSerializer):
         if q.qtype != QuestionType.TEXT and not data['selected_answers']:
             raise serializers.ValidationError('Choice answer from list for this question')
 
-
         return data
+
+
+class PassedQuestionDetailSerializer(QuestionDetailSerializer):
+    answers = AnswerSerializer(many=True, read_only=True)
+    users_answers = UserAnswerSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Question
+        fields = ['id', 'poll', 'text', 'qtype', 'answers', 'users_answers']
+
+
+class PassedPollSerializer(serializers.ModelSerializer):
+    questions = PassedQuestionDetailSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Poll
+        fields = [
+            'id', 'title', 'start_date', 'finish_date', 'description',
+            'questions',
+        ]
+
