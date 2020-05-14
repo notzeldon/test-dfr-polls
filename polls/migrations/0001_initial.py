@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('text', models.CharField(max_length=255, verbose_name='text')),
                 ('qtype', models.IntegerField(choices=[(1, 'text'), (2, 'one option'), (3, 'several options')], verbose_name='type')),
-                ('poll', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='questions', to='posts.Poll')),
+                ('poll', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='questions', to='polls.Poll')),
             ],
             options={
                 'verbose_name': 'question',
@@ -57,8 +57,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('typed_answer', models.CharField(max_length=255, null=True, verbose_name='typed answer')),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='users_answers', to='posts.Question')),
-                ('selected_answers', models.ManyToManyField(blank=True, related_name='_useranswer_selected_answers_+', to='posts.Answer', verbose_name='selected answer')),
+                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='users_answers', to='polls.Question')),
+                ('selected_answers', models.ManyToManyField(blank=True, related_name='_useranswer_selected_answers_+', to='polls.Answer', verbose_name='selected answer')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='answers', to=settings.AUTH_USER_MODEL, verbose_name='user')),
             ],
             options={
@@ -69,6 +69,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='answer',
             name='question',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='answers', to='posts.Question'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='answers', to='polls.Question'),
         ),
     ]
