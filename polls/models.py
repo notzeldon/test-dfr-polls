@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.timezone import localtime
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -46,6 +47,9 @@ class Poll(models.Model):
 
     def __str__(self):
         return self.title
+
+    def is_active(self):
+        return self.start_date <= localtime() < self.finish_date
 
 
 '''
